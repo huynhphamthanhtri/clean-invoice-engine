@@ -354,25 +354,34 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(showPostActionOffer, 400);
     });
 
-    // Outbound Link UTM & Referral Parameter Decorator
+    // Outbound Link UTM & Referral Parameter Decorator (Hardened Allowlist)
     function decorateOutboundLinks() {
-      const searchParams = new URLSearchParams(window.location.search);
-      if (!searchParams.toString()) return;
+      try {
+        const searchParams = new URLSearchParams(window.location.search);
+        if (!searchParams.toString()) return;
 
-      const outgoingLinks = document.querySelectorAll('a[href*="freelanceosmmo.gumroad.com"]');
-      outgoingLinks.forEach(link => {
-        try {
-          const url = new URL(link.href);
-          searchParams.forEach((val, key) => {
-            if (!url.searchParams.has(key)) {
-              url.searchParams.set(key, val);
-            }
-          });
-          link.href = url.toString();
-        } catch (e) {
-          // ignore malformed urls
-        }
-      });
+        const ALLOWED_CAMPAIGN_KEYS = ['ref', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+        const outgoingLinks = document.querySelectorAll('a[href*="freelanceosmmo.gumroad.com"]');
+
+        outgoingLinks.forEach(link => {
+          try {
+            const url = new URL(link.href);
+            ALLOWED_CAMPAIGN_KEYS.forEach(key => {
+              if (searchParams.has(key) && !url.searchParams.has(key)) {
+                const val = searchParams.get(key);
+                if (val && typeof val === 'string' && val.length < 100) {
+                  url.searchParams.set(key, val.trim());
+                }
+              }
+            });
+            link.href = url.toString();
+          } catch (e) {
+            // Suppress error on individual link
+          }
+        });
+      } catch (err) {
+        // Suppress URL parsing errors
+      }
     }
 
     decorateOutboundLinks();
