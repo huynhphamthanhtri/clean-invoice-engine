@@ -9,6 +9,10 @@
 
 🌐 **Live Web Application:** [https://freelanceos-9x6.pages.dev](https://freelanceos-9x6.pages.dev/?ref=github_clean_invoice_engine)
 
+<p align="center">
+  <img src="media/clean_invoice_workflow.gif" alt="Clean Invoicing Engine Workflow Demo" width="480">
+</p>
+
 ---
 
 ## 💡 Why This Was Built
